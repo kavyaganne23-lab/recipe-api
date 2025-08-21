@@ -5,6 +5,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let totalRecipes = 0;
     let currentFilters = {};
 
+    // --- CONFIGURATION ---
+    // Use your live Render API URL here
+    const API_BASE_URL = 'https://recipe-api-server.onrender.com';
+
     // --- DOM ELEMENT SELECTORS ---
     const app = document.getElementById('app');
     const titleFilter = document.getElementById('title-filter');
@@ -21,21 +25,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const fetchRecipes = async () => {
         let url;
         const filters = { ...currentFilters };
-        
-        // Decide which endpoint to use
+
+        // Decide which endpoint to use and construct the full URL
         if (Object.values(filters).some(val => val)) {
             const queryParams = new URLSearchParams(filters).toString();
-            url = `/api/recipes/search?${queryParams}`;
+            url = `${API_BASE_URL}/api/recipes/search?${queryParams}`;
         } else {
-            url = `/api/recipes?page=${currentPage}&limit=${limit}`;
+            url = `${API_BASE_URL}/api/recipes?page=${currentPage}&limit=${limit}`;
         }
-        
+
         try {
             const response = await fetch(url);
             if (!response.ok) throw new Error('Network response was not ok');
             const result = await response.json();
-            
-            // The /search endpoint doesn't paginate, so we handle both response types
+
             if (result.total !== undefined) {
                 totalRecipes = result.total;
                 renderTable(result.data);
@@ -83,12 +86,11 @@ document.addEventListener('DOMContentLoaded', () => {
         app.innerHTML = '';
         app.appendChild(table);
 
-        // Add click listeners to each new row
         table.querySelectorAll('tbody tr').forEach(row => {
             row.addEventListener('click', () => handleRowClick(row.dataset.recipeId, recipes));
         });
     };
-    
+
     const generateStars = (rating) => {
         if (!rating) return '<span class="star-rating">N/A</span>';
         const fullStars = Math.floor(rating);
@@ -116,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
             title: titleFilter.value,
             cuisine: cuisineFilter.value,
         };
-        currentPage = 1; // Reset to first page on new filter
+        currentPage = 1;
         fetchRecipes();
     };
 
@@ -124,27 +126,23 @@ document.addEventListener('DOMContentLoaded', () => {
         currentPage += direction;
         fetchRecipes();
     };
-    
+
     const handleRowClick = (recipeId, recipes) => {
         const recipe = recipes.find(r => r.id == recipeId);
         if (recipe) {
             openDrawer(recipe);
         }
     };
-    
+
     // --- DRAWER LOGIC ---
     const openDrawer = (recipe) => {
-        // Populate Header
         document.getElementById('drawer-title').textContent = recipe.title;
         document.getElementById('drawer-cuisine').textContent = recipe.cuisine;
-        
-        // Populate Content
         document.getElementById('drawer-description').textContent = recipe.description;
         document.getElementById('drawer-total-time').textContent = `${recipe.total_time || 'N/A'} mins`;
         document.getElementById('drawer-prep-time').textContent = `${recipe.prep_time || 'N/A'} mins`;
         document.getElementById('drawer-cook-time').textContent = `${recipe.cook_time || 'N/A'} mins`;
 
-        // Populate Nutrition Table
         const nutritionTable = document.getElementById('nutrition-table');
         const nutrients = recipe.nutrients || {};
         const nutrientKeys = ['calories', 'carbohydrateContent', 'cholesterolContent', 'fiberContent', 'proteinContent', 'saturatedFatContent', 'sodiumContent', 'sugarContent', 'fatContent'];
@@ -155,7 +153,6 @@ document.addEventListener('DOMContentLoaded', () => {
             </tr>
         `).join('');
 
-        // Show drawer and overlay
         drawer.classList.add('open');
         overlay.classList.add('open');
     };
@@ -163,7 +160,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeDrawer = () => {
         drawer.classList.remove('open');
         overlay.classList.remove('open');
-        // Reset time expander
         document.getElementById('sub-time-details').style.display = 'none';
         document.getElementById('expand-time').classList.remove('expanded');
     };
@@ -181,13 +177,11 @@ document.addEventListener('DOMContentLoaded', () => {
     drawerCloseBtn.addEventListener('click', closeDrawer);
     overlay.addEventListener('click', closeDrawer);
 
-    // Time expander logic
     document.getElementById('expand-time').addEventListener('click', (e) => {
         const subDetails = document.getElementById('sub-time-details');
         e.target.classList.toggle('expanded');
         subDetails.style.display = subDetails.style.display === 'block' ? 'none' : 'block';
     });
-    
-    // Initial fetch
+
     fetchRecipes();
 });

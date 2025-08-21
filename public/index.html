@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Securin Recipe Book</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="container">
+        <h1>Recipe Book</h1>
+
+        <div class="controls">
+            <div id="filters">
+                <input type="text" id="title-filter" placeholder="Filter by Title...">
+                <input type="text" id="cuisine-filter" placeholder="Filter by Cuisine...">
+            </div>
+
+            <div id="pagination">
+                <label for="results-per-page">Results per page:</label>
+                <select id="results-per-page">
+                    <option value="15">15</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                </select>
+                <span id="page-info"></span>
+                <button id="prev-page">Previous</button>
+                <button id="next-page">Next</button>
+            </div>
+        </div>
+
+        <div id="app"></div>
+    </div>
+
+    <div id="recipe-drawer" class="drawer">
+        <div class="drawer-header">
+            <h2 id="drawer-title">Recipe Title</h2>
+            <p id="drawer-cuisine" class="cuisine">Cuisine</p>
+            <button id="drawer-close" class="drawer-close">&times;</button>
+        </div>
+        <div class="drawer-content">
+            <div class="detail-section">
+                <h3>Description</h3>
+                <p id="drawer-description"></p>
+            </div>
+            <div class="detail-section">
+                <h3>Time</h3>
+                <div class="key-value">
+                    <span class="key">Total Time:</span>
+                    <span id="drawer-total-time"></span>
+                    <span id="expand-time">&#9658;</span> </div>
+                <div id="sub-time-details">
+                    <div class="key-value"><span class="key">Prep Time:</span> <span id="drawer-prep-time"></span></div>
+                    <div class="key-value"><span class="key">Cook Time:</span> <span id="drawer-cook-time"></span></div>
+                </div>
+            </div>
+            <div class="detail-section">
+                <h3>Nutrition</h3>
+                <table id="nutrition-table">
+                    </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="overlay" class="overlay"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
